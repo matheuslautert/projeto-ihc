@@ -1,156 +1,424 @@
-import { Users, Briefcase, GraduationCap, FileText, TrendingUp, Clock } from 'lucide-react'
+import React, { useState } from 'react'
+import { 
+  TrendingUp, 
+  Users, 
+  Building2, 
+  GraduationCap, 
+  CheckCircle, 
+  AlertTriangle, 
+  Clock, 
+  Calendar,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  BarChart3,
+  Target,
+  Award,
+  BookOpen,
+  RefreshCw
+} from 'lucide-react'
+import { useFilteredInternships, useInternshipData, useInternshipStats } from '../hooks/useInternships'
+import { DataTable } from '../components/ui/DataTable'
+import { StatusBadge } from '../components/ui/StatusBadge'
+import { Internship, InternshipFilters, InternshipStatus } from '../types/internship'
+import { generateRouteId } from '../lib/utils'
+import { Link } from 'react-router-dom'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { useAuth } from '../hooks/useAuth'
+import { DashboardCharts } from '../components/charts/DashboardCharts'
 
-const stats = [
-  {
-    name: 'Total de Alunos',
-    value: '1,234',
-    change: '+12%',
-    changeType: 'positive',
-    icon: Users,
-  },
-  {
-    name: 'Vagas Ativas',
-    value: '89',
-    change: '+5%',
-    changeType: 'positive',
-    icon: Briefcase,
-  },
-  {
-    name: 'Orientadores',
-    value: '45',
-    change: '+2%',
-    changeType: 'positive',
-    icon: GraduationCap,
-  },
-  {
-    name: 'Documentos Pendentes',
-    value: '23',
-    change: '-8%',
-    changeType: 'negative',
-    icon: FileText,
-  },
-]
+// Function to determine internship status
+const getInternshipStatus = (internship: Internship): InternshipStatus => {
+  if (internship.conclusaoEstagio && internship.conclusaoEstagio.trim()) {
+    const motivo = internship.motivoConclusao?.toLowerCase() || ''
+    if (motivo.includes('contratação')) return 'CONCLUÍDO'
+    if (motivo.includes('desistência')) return 'CANCELADO'
+    if (motivo.includes('demissão')) return 'INTERROMPIDO'
+    if (motivo.includes('encerramento')) return 'CONCLUÍDO'
+    if (motivo.includes('interrupção')) return 'INTERROMPIDO'
+    if (motivo.includes('cancelamento')) return 'CANCELADO'
+    return 'CONCLUÍDO'
+  }
+  return 'ATIVO'
+}
 
-const recentActivities = [
-  {
-    id: 1,
-    type: 'vaga',
-    title: 'Nova vaga de estágio em Desenvolvimento Web',
-    description: 'Empresa TechCorp está oferecendo 5 vagas',
-    time: '2 horas atrás',
-  },
-  {
-    id: 2,
-    type: 'aluno',
-    title: 'João Silva foi aprovado para estágio',
-    description: 'Estágio na área de Marketing Digital',
-    time: '4 horas atrás',
-  },
-  {
-    id: 3,
-    type: 'documento',
-    title: 'Novo documento enviado',
-    description: 'Relatório de atividades do mês',
-    time: '6 horas atrás',
-  },
-]
+// Function to format date
+const formatDate = (dateStr: string | undefined): string => {
+  if (!dateStr || dateStr.trim() === '' || dateStr === '#VALUE!') {
+    return '-'
+  }
+  
+  try {
+    const date = new Date(dateStr)
+    if (!isNaN(date.getTime())) {
+      return format(date, 'dd/MM/yyyy', { locale: ptBR })
+    }
+  } catch {
+    // If can't parse, return as is
+  }
+  
+  return dateStr
+}
 
 export function Dashboard() {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
-        <p className="text-text-secondary mt-2">Visão geral da plataforma de estágios</p>
-      </div>
+  const [activeTab, setActiveTab] = useState<'overview' | 'ativos' | 'concluidos'>('overview')
+  const { user } = useAuth()
+  
+  // Load data
+  const { data: internshipData, isLoading: isLoadingData } = useInternshipData()
+  const { data: stats, isLoading: isLoadingStats } = useInternshipStats()
+  
+  // Filter active internships
+  const activeFilters: InternshipFilters = { status: ['ATIVO'] }
+  const { data: activeInternships } = useFilteredInternships(activeFilters)
+  
+  // Filter concluded internships
+  const concludedFilters: InternshipFilters = { status: ['CONCLUÍDO'] }
+  const { data: concludedInternships } = useFilteredInternships(concludedFilters)
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => {
-          const Icon = stat.icon
-          return (
-            <div key={stat.name} className="card">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-text-secondary text-sm font-medium">{stat.name}</p>
-                  <p className="text-2xl font-bold text-text-primary mt-1">{stat.value}</p>
-                </div>
-                <div className="w-12 h-12 bg-spotify-green/10 rounded-lg flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-spotify-green" />
-                </div>
-              </div>
-              <div className="flex items-center mt-4">
-                <TrendingUp className={`w-4 h-4 mr-1 ${
-                  stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
-                }`} />
-                <span className={`text-sm font-medium ${
-                  stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {stat.change}
-                </span>
-                <span className="text-text-secondary text-sm ml-1">vs mês anterior</span>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+  const isLoading = isLoadingData || isLoadingStats
 
-      {/* Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Atividades Recentes</h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-spotify-green rounded-full mt-2"></div>
-                <div className="flex-1">
-                  <p className="text-text-primary font-medium">{activity.title}</p>
-                  <p className="text-text-secondary text-sm">{activity.description}</p>
-                  <div className="flex items-center mt-1">
-                    <Clock className="w-3 h-3 text-text-tertiary mr-1" />
-                    <span className="text-text-tertiary text-xs">{activity.time}</span>
-                  </div>
-                </div>
-              </div>
+  // Carregar todos os estágios para os gráficos
+  const allInternships = internshipData?.internships || []
+  // Detectar se é orientador
+  const isAdvisor = user?.tipo === 'orientador'
+  const advisorName = isAdvisor ? user?.nome : undefined
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 spotify-loading rounded w-1/4 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-32 spotify-loading rounded"></div>
             ))}
           </div>
         </div>
+      </div>
+    )
+  }
 
-        <div className="card">
-          <h3 className="text-lg font-semibold text-text-primary mb-4">Próximos Prazos</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-background-tertiary rounded-lg">
-              <div>
-                <p className="text-text-primary font-medium">Entrega de Relatórios</p>
-                <p className="text-text-secondary text-sm">Relatórios mensais dos estagiários</p>
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Dashboard de Estágios</h1>
+          <p className="text-text-muted">
+            Visão geral dos estágios da Engenharia de Telecomunicações
+          </p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RefreshCw className="h-5 w-5 text-text-muted" />
+          <span className="text-sm text-text-muted">
+            Última atualização: {new Date().toLocaleString('pt-BR')}
+          </span>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-blue bg-opacity-20 rounded-lg">
+                <Users className="h-6 w-6 text-spotify-blue" />
               </div>
-              <div className="text-right">
-                <p className="text-spotify-green font-medium">2 dias</p>
-                <p className="text-text-tertiary text-xs">15/12/2024</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-background-tertiary rounded-lg">
-              <div>
-                <p className="text-text-primary font-medium">Avaliação de Estágio</p>
-                <p className="text-text-secondary text-sm">Avaliação semestral dos orientadores</p>
-              </div>
-              <div className="text-right">
-                <p className="text-yellow-400 font-medium">5 dias</p>
-                <p className="text-text-tertiary text-xs">18/12/2024</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 bg-background-tertiary rounded-lg">
-              <div>
-                <p className="text-text-primary font-medium">Renovação de Contratos</p>
-                <p className="text-text-secondary text-sm">Contratos de estágio vencendo</p>
-              </div>
-              <div className="text-right">
-                <p className="text-red-400 font-medium">1 semana</p>
-                <p className="text-text-tertiary text-xs">22/12/2024</p>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Total de Estágios</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.total}</p>
               </div>
             </div>
           </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-green bg-opacity-20 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-spotify-green" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Estágios Ativos</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.active}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-blue bg-opacity-20 rounded-lg">
+                <Target className="h-6 w-6 text-spotify-blue" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Concluídos</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.concluded}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-purple bg-opacity-20 rounded-lg">
+                <GraduationCap className="h-6 w-6 text-spotify-purple" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Obrigatórios</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.mandatory}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Additional Statistics */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-yellow bg-opacity-20 rounded-lg">
+                <AlertTriangle className="h-6 w-6 text-spotify-yellow" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Interrompidos</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.interrupted}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-red bg-opacity-20 rounded-lg">
+                <AlertTriangle className="h-6 w-6 text-spotify-red" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Cancelados</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.canceled}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-orange bg-opacity-20 rounded-lg">
+                <Clock className="h-6 w-6 text-spotify-orange" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Opcionais</p>
+                <p className="text-2xl font-bold text-text-primary">{stats.optional}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gráficos e análises */}
+      <DashboardCharts internships={allInternships} isAdvisor={isAdvisor} advisorName={advisorName} />
+
+      {/* Tabs */}
+      <div className="card">
+        <div className="border-b border-border-primary">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'overview'
+                  ? 'border-spotify-green text-spotify-green'
+                  : 'border-transparent text-text-muted hover:text-text-primary hover:border-border-secondary'
+              }`}
+            >
+              Visão Geral
+            </button>
+            <button
+              onClick={() => setActiveTab('ativos')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'ativos'
+                  ? 'border-spotify-green text-spotify-green'
+                  : 'border-transparent text-text-muted hover:text-text-primary hover:border-border-secondary'
+              }`}
+            >
+              Estágios Ativos
+            </button>
+            <button
+              onClick={() => setActiveTab('concluidos')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'concluidos'
+                  ? 'border-spotify-green text-spotify-green'
+                  : 'border-transparent text-text-muted hover:text-text-primary hover:border-border-secondary'
+              }`}
+            >
+              Estágios Concluídos
+            </button>
+          </nav>
+        </div>
+
+        <div className="p-6">
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Resumo dos Estágios</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="card-minimal">
+                    <h4 className="font-medium text-text-primary mb-2">Estágios Ativos</h4>
+                    <p className="text-3xl font-bold text-spotify-green">{stats?.active || 0}</p>
+                    <p className="text-sm text-text-muted mt-1">em andamento</p>
+                  </div>
+                  <div className="card-minimal">
+                    <h4 className="font-medium text-text-primary mb-2">Estágios Concluídos</h4>
+                    <p className="text-3xl font-bold text-spotify-blue">{stats?.concluded || 0}</p>
+                    <p className="text-sm text-text-muted mt-1">finalizados</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ativos' && (
+            <div>
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Estágios Ativos</h3>
+              {activeInternships && activeInternships.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <DataTable
+                    data={activeInternships}
+                    columns={[
+                      { 
+                        key: 'nome', 
+                        header: 'Estagiário', 
+                        sortable: true,
+                        width: '30%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/aluno/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'empresa', 
+                        header: 'Empresa', 
+                        sortable: true,
+                        width: '25%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/empresa/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'orientadorAtual', 
+                        header: 'Orientador', 
+                        sortable: true,
+                        width: '30%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/orientador/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'terminoPrevisto', 
+                        header: 'Término Previsto', 
+                        render: (value: any) => formatDate(value),
+                        sortable: true,
+                        width: '15%'
+                      }
+                    ]}
+                    title="Estágios Ativos"
+                    searchable
+                    exportable
+                    itemsPerPage={10}
+                  />
+                </div>
+              ) : (
+                <p className="text-text-muted text-center py-8">Nenhum estágio ativo encontrado.</p>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'concluidos' && (
+            <div>
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Estágios Concluídos</h3>
+              {concludedInternships && concludedInternships.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <DataTable
+                    data={concludedInternships}
+                    columns={[
+                      { 
+                        key: 'nome', 
+                        header: 'Estagiário', 
+                        sortable: true,
+                        width: '25%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/aluno/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'empresa', 
+                        header: 'Empresa', 
+                        sortable: true,
+                        width: '25%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/empresa/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'orientadorAtual', 
+                        header: 'Orientador', 
+                        sortable: true,
+                        width: '25%',
+                        render: (value: any, item: any) => (
+                          <Link 
+                            to={`/orientador/${generateRouteId(value)}`}
+                            className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+                          >
+                            {value}
+                          </Link>
+                        )
+                      },
+                      { 
+                        key: 'dataConclusao', 
+                        header: 'Data de Conclusão', 
+                        render: (value: any) => formatDate(value),
+                        sortable: true,
+                        width: '15%'
+                      },
+                      { 
+                        key: 'motivoConclusao', 
+                        header: 'Motivo da Conclusão', 
+                        sortable: true,
+                        width: '10%'
+                      }
+                    ]}
+                    title="Estágios Concluídos"
+                    searchable
+                    exportable
+                    itemsPerPage={10}
+                  />
+                </div>
+              ) : (
+                <p className="text-text-muted text-center py-8">Nenhum estágio concluído encontrado.</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

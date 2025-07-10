@@ -11,22 +11,136 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Scrollbar styling for Spotify-like appearance */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-primary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-background-tertiary rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-background-quaternary;
+  }
 }
 
 @layer components {
+  /* Spotify-style buttons */
   .btn-primary {
-    @apply bg-spotify-green hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-spotify-green hover:bg-spotify-greenHover text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-spotify-green focus:ring-opacity-50;
   }
   
   .btn-secondary {
-    @apply bg-background-tertiary hover:bg-gray-700 text-text-primary font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-background-tertiary hover:bg-hover-primary text-text-primary font-medium py-2.5 px-5 rounded-full transition-all duration-200 border border-border-primary hover:border-border-secondary focus:outline-none focus:ring-2 focus:ring-spotify-green focus:ring-opacity-50;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-background-tertiary text-text-secondary hover:text-text-primary font-medium py-2 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-spotify-green focus:ring-opacity-50;
+  }
+
+  .btn-danger {
+    @apply bg-spotify-red hover:bg-red-600 text-white font-medium py-2.5 px-5 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-spotify-red focus:ring-opacity-50;
   }
   
+  /* Spotify-style cards */
   .card {
-    @apply bg-background-secondary rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow duration-200;
+    @apply bg-background-card rounded-lg p-6 shadow-spotify hover:shadow-spotify-hover transition-all duration-300 hover:bg-background-elevated border border-border-primary hover:border-border-secondary;
+  }
+
+  .card-hover {
+    @apply card hover:scale-[1.02] cursor-pointer;
+  }
+
+  .card-minimal {
+    @apply bg-background-secondary rounded-lg p-4 border border-border-primary hover:border-border-secondary transition-all duration-200;
   }
   
+  /* Spotify-style inputs */
   .input-field {
-    @apply bg-background-tertiary border border-gray-600 rounded-lg px-4 py-2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-spotify-green focus:border-transparent;
+    @apply bg-background-tertiary border border-border-primary rounded-lg px-4 py-3 text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-spotify-green focus:border-transparent transition-all duration-200;
+  }
+
+  .input-search {
+    @apply bg-background-tertiary border border-border-primary rounded-full px-4 py-2.5 text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-spotify-green focus:border-transparent transition-all duration-200;
+  }
+
+  /* Spotify-style navigation */
+  .nav-item {
+    @apply flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-background-tertiary hover:text-text-primary;
+  }
+
+  .nav-item-active {
+    @apply bg-spotify-green text-white hover:bg-spotify-greenHover;
+  }
+
+  /* Spotify-style status badges */
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-active {
+    @apply bg-spotify-green bg-opacity-20 text-spotify-green border border-spotify-green border-opacity-30;
+  }
+
+  .status-pending {
+    @apply bg-spotify-yellow bg-opacity-20 text-spotify-yellow border border-spotify-yellow border-opacity-30;
+  }
+
+  .status-completed {
+    @apply bg-spotify-blue bg-opacity-20 text-spotify-blue border border-spotify-blue border-opacity-30;
+  }
+
+  .status-cancelled {
+    @apply bg-spotify-red bg-opacity-20 text-spotify-red border border-spotify-red border-opacity-30;
+  }
+
+  /* Spotify-style tables */
+  .table-container {
+    @apply bg-background-card rounded-lg overflow-hidden border border-border-primary;
+  }
+
+  .table-header {
+    @apply bg-background-tertiary border-b border-border-primary;
+  }
+
+  .table-row {
+    @apply border-b border-border-primary hover:bg-background-tertiary transition-colors duration-200;
+  }
+
+  .table-row:last-child {
+    @apply border-b-0;
+  }
+
+  /* Spotify-style loading and animations */
+  .spotify-loading {
+    @apply animate-pulse bg-background-tertiary rounded;
+  }
+
+  .spotify-fade-in {
+    @apply animate-fade-in;
+  }
+
+  .spotify-slide-up {
+    @apply animate-slide-up;
+  }
+
+  /* Spotify-style gradients */
+  .gradient-spotify {
+    background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+  }
+
+  .gradient-dark {
+    background: linear-gradient(135deg, #121212 0%, #181818 100%);
+  }
+
+  /* Spotify-style focus states */
+  .focus-spotify {
+    @apply focus:outline-none focus:ring-2 focus:ring-spotify-green focus:ring-opacity-50;
   }
 } 

@@ -10,4 +10,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  publicDir: 'public',
+  server: {
+    fs: {
+      // Permitir acesso a arquivos fora da pasta src
+      allow: ['..']
+    }
+  }
 }) 

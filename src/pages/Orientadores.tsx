@@ -1,71 +1,79 @@
-import { Plus, Search, Filter, User, Mail, Phone, MapPin, GraduationCap, Users, BookOpen } from 'lucide-react'
-
-const orientadores = [
-  {
-    id: 1,
-    nome: 'Prof. Maria Oliveira Silva',
-    email: 'maria.oliveira@universidade.edu.br',
-    telefone: '(11) 99999-9999',
-    departamento: 'Ciência da Computação',
-    especialidade: 'Desenvolvimento Web',
-    localizacao: 'São Paulo, SP',
-    status: 'Ativo',
-    alunosAtivos: 8,
-    totalAlunos: 25,
-    cargaHoraria: '40h',
-    formacao: 'Doutorado em Ciência da Computação',
-  },
-  {
-    id: 2,
-    nome: 'Prof. Carlos Santos Costa',
-    email: 'carlos.santos@universidade.edu.br',
-    telefone: '(21) 88888-8888',
-    departamento: 'Marketing',
-    especialidade: 'Marketing Digital',
-    localizacao: 'Rio de Janeiro, RJ',
-    status: 'Ativo',
-    alunosAtivos: 5,
-    totalAlunos: 18,
-    cargaHoraria: '40h',
-    formacao: 'Mestrado em Administração',
-  },
-  {
-    id: 3,
-    nome: 'Prof. Roberto Silva Almeida',
-    email: 'roberto.silva@universidade.edu.br',
-    telefone: '(31) 77777-7777',
-    departamento: 'Administração',
-    especialidade: 'Finanças Corporativas',
-    localizacao: 'Belo Horizonte, MG',
-    status: 'Ativo',
-    alunosAtivos: 6,
-    totalAlunos: 22,
-    cargaHoraria: '40h',
-    formacao: 'Doutorado em Administração',
-  },
-  {
-    id: 4,
-    nome: 'Prof. Juliana Costa Ferreira',
-    email: 'juliana.costa@universidade.edu.br',
-    telefone: '(41) 66666-6666',
-    departamento: 'Design',
-    especialidade: 'Design de Interface',
-    localizacao: 'Curitiba, PR',
-    status: 'Ativo',
-    alunosAtivos: 4,
-    totalAlunos: 15,
-    cargaHoraria: '40h',
-    formacao: 'Mestrado em Design',
-  },
-]
+import React, { useState } from 'react'
+import { Plus, Search, Filter, User, Mail, Phone, MapPin, GraduationCap, Users, BookOpen, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
+import { useAdvisors, useFilteredInternships } from '../hooks/useInternships'
+import { DataTable } from '../components/ui/DataTable'
+import { StatusBadge } from '../components/ui/StatusBadge'
+import { Advisor, InternshipFilters } from '../types/internship'
+import { generateRouteId } from '../lib/utils'
+import { Link } from 'react-router-dom'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export function Orientadores() {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
+  // Load data
+  const { data: advisors, isLoading: isLoadingAdvisors } = useAdvisors()
+
+  // Create filters for internships by advisor
+  const filters: InternshipFilters = React.useMemo(() => {
+    const filter: InternshipFilters = {}
+    
+    if (searchTerm) {
+      filter.search = searchTerm
+    }
+    
+    if (statusFilter !== 'all') {
+      filter.status = [statusFilter as any]
+    }
+    
+    return filter
+  }, [searchTerm, statusFilter])
+
+  // Get filtered internships
+  const { data: filteredInternships } = useFilteredInternships(filters)
+
+  // Transform advisors data for display
+  const displayData = React.useMemo(() => {
+    if (!advisors) return []
+    
+    return advisors.map(advisor => ({
+      nome: advisor.nome,
+      totalInternships: advisor.totalInternships,
+      activeInternships: advisor.activeInternships,
+      concludedInternships: advisor.concludedInternships,
+      // Add other fields that might be needed for display
+      orientadorAtual: advisor.nome,
+      orientadorAnterior: advisor.nome,
+      empresa: '',
+      tceEntregue: '',
+      conclusaoEstagio: '',
+      dataConclusao: '',
+      motivoConclusao: '',
+      prazoMaximo: '',
+      fpe: '',
+      inicioTce: '',
+      terminoPrevisto: '',
+      relatorioParcial1: { limite: '', entregue: '', avaliado: '' },
+      relatorioParcial2: { limite: '', entregue: '', avaliado: '' },
+      relatorioParcial3: { limite: '', entregue: '', avaliado: '' },
+      relatorioFinal: { limite: '', entregue: '', avaliado: '' },
+      prorrogacoes: [],
+      supervisorEmpresa: '',
+      obrigatorio: undefined,
+    }))
+  }, [advisors])
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-text-primary">Orientadores</h1>
-          <p className="text-text-secondary mt-2">Gerencie os professores orientadores</p>
+          <h1 className="text-2xl font-bold text-text-primary">Orientadores</h1>
+          <p className="text-text-muted">
+            Lista de orientadores e seus estágios supervisionados
+          </p>
         </div>
         <button className="btn-primary flex items-center">
           <Plus className="w-4 h-4 mr-2" />
@@ -73,131 +81,119 @@ export function Orientadores() {
         </button>
       </div>
 
-      {/* Filtros e Busca */}
-      <div className="card">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Buscar orientadores..."
-              className="w-full bg-background-tertiary border border-gray-600 rounded-lg pl-10 pr-4 py-2 text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-spotify-green focus:border-transparent"
-            />
-          </div>
-          <div className="flex gap-2">
-            <select className="input-field">
-              <option value="">Departamento</option>
-              <option value="computacao">Ciência da Computação</option>
-              <option value="marketing">Marketing</option>
-              <option value="administracao">Administração</option>
-              <option value="design">Design</option>
-            </select>
-            <select className="input-field">
-              <option value="">Status</option>
-              <option value="ativo">Ativo</option>
-              <option value="inativo">Inativo</option>
-            </select>
-            <button className="btn-secondary flex items-center">
-              <Filter className="w-4 h-4 mr-2" />
-              Filtros
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Lista de Orientadores */}
-      <div className="grid gap-6">
-        {orientadores.map((orientador) => (
-          <div key={orientador.id} className="card hover:bg-background-tertiary transition-colors duration-200">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-spotify-green rounded-full flex items-center justify-center">
-                    <GraduationCap className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-text-primary">{orientador.nome}</h3>
-                    <div className="flex items-center gap-4 text-text-secondary text-sm">
-                      <span className="flex items-center">
-                        <Mail className="w-4 h-4 mr-1" />
-                        {orientador.email}
-                      </span>
-                      <span className="flex items-center">
-                        <Phone className="w-4 h-4 mr-1" />
-                        {orientador.telefone}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
-                    {orientador.status}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="flex items-center text-text-secondary">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    <span>{orientador.departamento}</span>
-                  </div>
-                  <div className="flex items-center text-text-secondary">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{orientador.localizacao}</span>
-                  </div>
-                  <div className="flex items-center text-text-secondary">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>{orientador.alunosAtivos} alunos ativos</span>
-                  </div>
-                  <div className="flex items-center text-text-secondary">
-                    <GraduationCap className="w-4 h-4 mr-2" />
-                    <span>{orientador.cargaHoraria}</span>
-                  </div>
-                </div>
-                
-                <div className="mb-4">
-                  <p className="text-text-secondary text-sm mb-2">
-                    <strong>Especialidade:</strong> {orientador.especialidade}
-                  </p>
-                  <p className="text-text-secondary text-sm">
-                    <strong>Formação:</strong> {orientador.formacao}
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center text-sm text-text-secondary">
-                    <span>Total de alunos orientados: {orientador.totalAlunos}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-text-secondary">
-                    <span>Taxa de conclusão: {Math.round((orientador.totalAlunos - orientador.alunosAtivos) / orientador.totalAlunos * 100)}%</span>
-                  </div>
-                </div>
+      {/* Statistics */}
+      {advisors && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-blue bg-opacity-20 rounded-lg">
+                <Users className="h-6 w-6 text-spotify-blue" />
               </div>
-              
-              <div className="flex flex-col gap-2 ml-4">
-                <button className="btn-primary text-sm px-4 py-2">
-                  Ver Perfil
-                </button>
-                <button className="btn-secondary text-sm px-4 py-2">
-                  Editar
-                </button>
-                <button className="btn-secondary text-sm px-4 py-2">
-                  Alunos
-                </button>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Total de Orientadores</p>
+                <p className="text-2xl font-bold text-text-primary">{advisors.length}</p>
               </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Paginação */}
-      <div className="flex items-center justify-between">
-        <p className="text-text-secondary text-sm">
-          Mostrando 1-4 de 4 orientadores
-        </p>
-        <div className="flex items-center gap-2">
-          <button className="btn-secondary px-3 py-1 text-sm">Anterior</button>
-          <button className="bg-spotify-green text-white px-3 py-1 rounded text-sm">1</button>
-          <button className="btn-secondary px-3 py-1 text-sm">Próximo</button>
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-green bg-opacity-20 rounded-lg">
+                <CheckCircle className="h-6 w-6 text-spotify-green" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Estágios Ativos</p>
+                <p className="text-2xl font-bold text-text-primary">
+                  {advisors.reduce((sum, advisor) => sum + advisor.activeInternships, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="flex items-center">
+              <div className="p-2 bg-spotify-purple bg-opacity-20 rounded-lg">
+                <BookOpen className="h-6 w-6 text-spotify-purple" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-text-muted">Total de Estágios</p>
+                <p className="text-2xl font-bold text-text-primary">
+                  {advisors.reduce((sum, advisor) => sum + advisor.totalInternships, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="card">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Search */}
+          <div>
+            <label htmlFor="search-filter" className="block text-sm font-medium text-text-muted mb-2">
+              Buscar
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted h-4 w-4" />
+              <input
+                id="search-filter"
+                type="text"
+                placeholder="Nome do orientador..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input-field w-full pl-10 pr-3"
+              />
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label htmlFor="status-filter" className="block text-sm font-medium text-text-muted mb-2">
+              Status dos Estágios
+            </label>
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="all">Todos</option>
+              <option value="ATIVO">Ativos</option>
+              <option value="CONCLUÍDO">Concluídos</option>
+              <option value="INTERROMPIDO">Interrompidos</option>
+              <option value="CANCELADO">Cancelados</option>
+            </select>
+          </div>
         </div>
       </div>
+
+      {/* Data Table */}
+      <DataTable 
+        data={displayData} 
+        columns={[
+          { 
+            key: 'nome', 
+            header: 'Orientador', 
+            sortable: true,
+            render: (value: any, item: any) => (
+              <Link 
+                to={`/orientador/${generateRouteId(value)}`}
+                className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
+              >
+                {value}
+              </Link>
+            )
+          },
+          { key: 'totalInternships', header: 'Total de Estágios', sortable: true },
+          { key: 'activeInternships', header: 'Estágios Ativos', sortable: true },
+          { key: 'concludedInternships', header: 'Estágios Concluídos', sortable: true },
+        ]}
+        title="Orientadores"
+        searchable
+        exportable
+        loading={isLoadingAdvisors}
+      />
     </div>
   )
 } 
