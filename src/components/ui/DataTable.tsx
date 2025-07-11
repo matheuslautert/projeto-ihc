@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Search, Download, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+import { Search, Download, ChevronLeft, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 
 interface Column<T> {

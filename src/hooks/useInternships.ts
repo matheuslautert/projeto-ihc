@@ -5,7 +5,7 @@ import {
   getInternshipStats,
   exportToCSV 
 } from '../services/internshipService'
-import { InternshipFilters, Internship } from '../types/internship'
+import { InternshipFilters } from '../types/internship'
 
 // Query keys
 export const internshipKeys = {

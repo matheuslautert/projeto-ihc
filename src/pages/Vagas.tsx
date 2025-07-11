@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
-import { Plus, Search, Filter, MapPin, Clock, DollarSign, Building, Building2, Users, Calendar, TrendingUp, CheckCircle } from 'lucide-react'
-import { useCompanies, useFilteredInternships } from '../hooks/useInternships'
+import { Plus, Search, Building2, Users } from 'lucide-react'
+import { useCompanies } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
-import { StatusBadge } from '../components/ui/StatusBadge'
-import { Company, InternshipFilters } from '../types/internship'
 import { generateRouteId } from '../lib/utils'
 import { Link } from 'react-router-dom'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 
 export function Vagas() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -15,24 +11,6 @@ export function Vagas() {
 
   // Load data
   const { data: companies, isLoading: isLoadingCompanies } = useCompanies()
-
-  // Create filters for internships by company
-  const filters: InternshipFilters = React.useMemo(() => {
-    const filter: InternshipFilters = {}
-    
-    if (searchTerm) {
-      filter.search = searchTerm
-    }
-    
-    if (statusFilter !== 'all') {
-      filter.status = [statusFilter as any]
-    }
-    
-    return filter
-  }, [searchTerm, statusFilter])
-
-  // Get filtered internships
-  const { data: filteredInternships } = useFilteredInternships(filters)
 
   // Transform companies data for display
   const displayData = React.useMemo(() => {
@@ -99,7 +77,7 @@ export function Vagas() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-2 bg-spotify-green bg-opacity-20 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-spotify-green" />
+                <Users className="h-6 w-6 text-spotify-green" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Estágios Ativos</p>
@@ -176,7 +154,7 @@ export function Vagas() {
             key: 'nome', 
             header: 'Empresa', 
             sortable: true,
-            render: (value: any, item: any) => (
+            render: (value: any) => (
               <Link 
                 to={`/empresa/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"

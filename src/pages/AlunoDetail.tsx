@@ -1,30 +1,19 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { 
   ArrowLeft, 
   User, 
   Building2, 
-  Calendar, 
   CheckCircle, 
-  Clock, 
   AlertTriangle,
-  TrendingUp,
-  GraduationCap,
-  Mail,
-  Phone,
-  MapPin,
-  Users,
   BookOpen,
   Target,
   Award,
-  FileText,
-  Star,
-  Clock3
+  Clock
 } from 'lucide-react'
-import { useInterns, useFilteredInternships } from '../hooks/useInternships'
-import { DataTable } from '../components/ui/DataTable'
+import { useFilteredInternships } from '../hooks/useInternships'
 import { StatusBadge } from '../components/ui/StatusBadge'
-import { extractNameFromRouteId, extractNameFromRouteIdImproved } from '../lib/utils'
+import { extractNameFromRouteIdImproved } from '../lib/utils'
 import { InternshipStatus } from '../types/internship'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -66,7 +55,6 @@ export function AlunoDetail() {
   const { alunoId } = useParams<{ alunoId: string }>()
   
   // Load data
-  const { data: interns } = useInterns()
   const { data: allInternships } = useFilteredInternships({})
   
   // Extract student name from route ID
@@ -233,7 +221,7 @@ export function AlunoDetail() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-2 bg-spotify-orange bg-opacity-20 rounded-lg">
-                <Clock3 className="h-6 w-6 text-spotify-orange" />
+                <Clock className="h-6 w-6 text-spotify-orange" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Duração Total</p>

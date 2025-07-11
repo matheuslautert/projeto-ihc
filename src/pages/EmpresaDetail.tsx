@@ -1,27 +1,18 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { 
   ArrowLeft, 
   Building2, 
   Users, 
-  Calendar, 
   CheckCircle, 
-  Clock, 
   AlertTriangle,
-  TrendingUp,
-  MapPin,
-  Mail,
-  Phone,
-  Globe,
   Target,
-  Award,
-  Briefcase,
-  Star
+  Award
 } from 'lucide-react'
 import { useCompanies, useFilteredInternships } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { StatusBadge } from '../components/ui/StatusBadge'
-import { extractNameFromRouteId, extractNameFromRouteIdImproved } from '../lib/utils'
+import { extractNameFromRouteIdImproved } from '../lib/utils'
 import { InternshipStatus } from '../types/internship'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -207,7 +198,7 @@ export function EmpresaDetail() {
           <div className="card">
             <div className="flex items-center">
               <div className="p-2 bg-spotify-orange bg-opacity-20 rounded-lg">
-                <Calendar className="h-6 w-6 text-spotify-orange" />
+                <Target className="h-6 w-6 text-spotify-orange" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Duração Média</p>
@@ -313,7 +304,7 @@ export function EmpresaDetail() {
           </div>
         ) : (
           <div className="text-center py-8">
-            <Briefcase className="w-12 h-12 text-text-muted mx-auto mb-4" />
+            <Building2 className="w-12 h-12 text-text-muted mx-auto mb-4" />
             <p className="text-text-muted">Nenhum estágio encontrado para esta empresa.</p>
           </div>
         )}

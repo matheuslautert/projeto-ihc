@@ -4,14 +4,11 @@ import {
   Empresa, 
   Orientador, 
   Estagiario, 
-  VisitaArticulador, 
-  VisitaOrientador,
   EstagioFilters,
   EstagioStats,
-  EstagioStatus,
-  MotivoConclusao
+  EstagioStatus
 } from '../types/estagios'
-import { parse, isValid, isAfter, isBefore, startOfDay } from 'date-fns'
+import { parse, isValid, isBefore, startOfDay } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 // Cache para os dados carregados
@@ -19,8 +16,6 @@ let estagiosCache: Estagio[] = []
 let empresasCache: Empresa[] = []
 let orientadoresCache: Orientador[] = []
 let estagiariosCache: Estagiario[] = []
-let visitasArticuladorCache: VisitaArticulador[] = []
-let visitasOrientadorCache: VisitaOrientador[] = []
 
 // Função para converter string de data para Date
 const parseDate = (dateStr: string): Date | null => {

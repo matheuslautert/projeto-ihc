@@ -1,27 +1,17 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { 
-  TrendingUp, 
   Users, 
-  Building2, 
   GraduationCap, 
   CheckCircle, 
   AlertTriangle, 
   Clock, 
-  Calendar,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  BarChart3,
-  Target,
-  Award,
-  BookOpen,
-  RefreshCw
+  Target, 
+  RefreshCw 
 } from 'lucide-react'
 import { useFilteredInternships, useInternshipData, useInternshipStats } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
-import { StatusBadge } from '../components/ui/StatusBadge'
-import { Internship, InternshipFilters, InternshipStatus } from '../types/internship'
+
+import { InternshipFilters } from '../types/internship'
 import { generateRouteId } from '../lib/utils'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -29,20 +19,7 @@ import { ptBR } from 'date-fns/locale'
 import { useAuth } from '../hooks/useAuth'
 import { DashboardCharts } from '../components/charts/DashboardCharts'
 
-// Function to determine internship status
-const getInternshipStatus = (internship: Internship): InternshipStatus => {
-  if (internship.conclusaoEstagio && internship.conclusaoEstagio.trim()) {
-    const motivo = internship.motivoConclusao?.toLowerCase() || ''
-    if (motivo.includes('contratação')) return 'CONCLUÍDO'
-    if (motivo.includes('desistência')) return 'CANCELADO'
-    if (motivo.includes('demissão')) return 'INTERROMPIDO'
-    if (motivo.includes('encerramento')) return 'CONCLUÍDO'
-    if (motivo.includes('interrupção')) return 'INTERROMPIDO'
-    if (motivo.includes('cancelamento')) return 'CANCELADO'
-    return 'CONCLUÍDO'
-  }
-  return 'ATIVO'
-}
+
 
 // Function to format date
 const formatDate = (dateStr: string | undefined): string => {
@@ -287,7 +264,7 @@ export function Dashboard() {
                         header: 'Estagiário', 
                         sortable: true,
                         width: '30%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/aluno/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -301,7 +278,7 @@ export function Dashboard() {
                         header: 'Empresa', 
                         sortable: true,
                         width: '25%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/empresa/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -315,7 +292,7 @@ export function Dashboard() {
                         header: 'Orientador', 
                         sortable: true,
                         width: '30%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/orientador/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -357,7 +334,7 @@ export function Dashboard() {
                         header: 'Estagiário', 
                         sortable: true,
                         width: '25%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/aluno/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -371,7 +348,7 @@ export function Dashboard() {
                         header: 'Empresa', 
                         sortable: true,
                         width: '25%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/empresa/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -385,7 +362,7 @@ export function Dashboard() {
                         header: 'Orientador', 
                         sortable: true,
                         width: '25%',
-                        render: (value: any, item: any) => (
+                        render: (value: any) => (
                           <Link 
                             to={`/orientador/${generateRouteId(value)}`}
                             className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"

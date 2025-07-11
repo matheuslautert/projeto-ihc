@@ -1,6 +1,4 @@
-import React from 'react'
 import { clsx } from 'clsx'
-import { EstagioStatus } from '../../types/estagios'
 import { InternshipStatus } from '../../types/internship'
 
 interface StatusBadgeProps {

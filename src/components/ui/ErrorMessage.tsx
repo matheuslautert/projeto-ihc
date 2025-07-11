@@ -1,5 +1,5 @@
 import React from 'react'
-import { AlertTriangle, RefreshCw, AlertCircle } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 interface ErrorMessageProps {
   title?: string
@@ -9,9 +9,7 @@ interface ErrorMessageProps {
 }
 
 export function ErrorMessage({ 
-  title = "Erro ao carregar dados", 
   message = "Ocorreu um erro ao carregar os dados. Tente novamente.",
-  onRetry,
   className = ""
 }: ErrorMessageProps) {
   return (

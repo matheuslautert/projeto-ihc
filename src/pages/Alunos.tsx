@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Plus, Search, Filter, User, Mail, Phone, MapPin, GraduationCap, Users, BookOpen, CheckCircle, AlertTriangle, Clock, Building2 } from 'lucide-react'
+import { Plus, Search, User, Building2 } from 'lucide-react'
 import { useInterns, useFilteredInternships } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { StatusBadge } from '../components/ui/StatusBadge'
-import { Intern, InternshipFilters, InternshipStatus } from '../types/internship'
+import { InternshipFilters, InternshipStatus } from '../types/internship'
 import { generateRouteId } from '../lib/utils'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
@@ -48,7 +48,7 @@ export function Alunos() {
   const [obrigatorioFilter, setObrigatorioFilter] = useState<string>('all')
 
   // Load data
-  const { data: interns, isLoading: isLoadingInterns } = useInterns()
+  const { isLoading: isLoadingInterns } = useInterns()
 
   // Create filters
   const filters: InternshipFilters = React.useMemo(() => {
@@ -207,7 +207,7 @@ export function Alunos() {
             key: 'nome', 
             header: 'Estagiário', 
             sortable: true,
-            render: (value: any, item: any) => (
+            render: (value: any) => (
               <Link 
                 to={`/aluno/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -220,7 +220,7 @@ export function Alunos() {
             key: 'empresa', 
             header: 'Empresa', 
             sortable: true,
-            render: (value: any, item: any) => (
+            render: (value: any) => (
               <Link 
                 to={`/empresa/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
@@ -233,7 +233,7 @@ export function Alunos() {
             key: 'orientadorAtual', 
             header: 'Orientador', 
             sortable: true,
-            render: (value: any, item: any) => (
+            render: (value: any) => (
               <Link 
                 to={`/orientador/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"

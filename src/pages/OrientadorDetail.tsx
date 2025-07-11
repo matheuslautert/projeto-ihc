@@ -1,18 +1,11 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { 
   ArrowLeft, 
   User, 
   Building2, 
-  Calendar, 
   CheckCircle, 
-  Clock, 
   AlertTriangle,
-  TrendingUp,
-  GraduationCap,
-  Mail,
-  Phone,
-  MapPin,
   Users,
   BookOpen,
   Target,
@@ -21,7 +14,7 @@ import {
 import { useAdvisors, useFilteredInternships } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { StatusBadge } from '../components/ui/StatusBadge'
-import { extractNameFromRouteId, extractNameFromRouteIdImproved } from '../lib/utils'
+import { extractNameFromRouteIdImproved } from '../lib/utils'
 import { InternshipStatus } from '../types/internship'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -148,7 +141,7 @@ export function OrientadorDetail() {
         </div>
         <div className="flex items-center space-x-2">
           <div className="p-2 bg-spotify-green bg-opacity-20 rounded-lg">
-            <GraduationCap className="h-6 w-6 text-spotify-green" />
+            <CheckCircle className="h-6 w-6 text-spotify-green" />
           </div>
         </div>
       </div>

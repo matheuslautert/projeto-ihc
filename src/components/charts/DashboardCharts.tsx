@@ -17,7 +17,7 @@ import {
   ResponsiveContainer
 } from 'recharts'
 import { Internship } from '../../types/internship'
-import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 interface DashboardChartsProps {
@@ -26,8 +26,8 @@ interface DashboardChartsProps {
   advisorName?: string
 }
 
-// Cores para os gráficos
-const COLORS = ['#1DB954', '#1E3A8A', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
+// Cores para os gráficos (não utilizadas no momento)
+// const COLORS = ['#1DB954', '#1E3A8A', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4']
 
 // Função para determinar status do estágio
 const getInternshipStatus = (internship: Internship): string => {
@@ -175,7 +175,7 @@ export function DashboardCharts({ internships, isAdvisor = false, advisorName }:
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -294,7 +294,7 @@ export function DashboardCharts({ internships, isAdvisor = false, advisorName }:
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     outerRadius={60}
                     fill="#8884d8"
                     dataKey="value"

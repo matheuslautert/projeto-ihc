@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
-import { Plus, Search, Filter, User, Mail, Phone, MapPin, GraduationCap, Users, BookOpen, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
-import { useAdvisors, useFilteredInternships } from '../hooks/useInternships'
+import { Plus, Search, Users, BookOpen, CheckCircle } from 'lucide-react'
+import { useAdvisors } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
-import { StatusBadge } from '../components/ui/StatusBadge'
-import { Advisor, InternshipFilters } from '../types/internship'
 import { generateRouteId } from '../lib/utils'
 import { Link } from 'react-router-dom'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 
 export function Orientadores() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -15,24 +11,6 @@ export function Orientadores() {
 
   // Load data
   const { data: advisors, isLoading: isLoadingAdvisors } = useAdvisors()
-
-  // Create filters for internships by advisor
-  const filters: InternshipFilters = React.useMemo(() => {
-    const filter: InternshipFilters = {}
-    
-    if (searchTerm) {
-      filter.search = searchTerm
-    }
-    
-    if (statusFilter !== 'all') {
-      filter.status = [statusFilter as any]
-    }
-    
-    return filter
-  }, [searchTerm, statusFilter])
-
-  // Get filtered internships
-  const { data: filteredInternships } = useFilteredInternships(filters)
 
   // Transform advisors data for display
   const displayData = React.useMemo(() => {
@@ -176,7 +154,7 @@ export function Orientadores() {
             key: 'nome', 
             header: 'Orientador', 
             sortable: true,
-            render: (value: any, item: any) => (
+            render: (value: any) => (
               <Link 
                 to={`/orientador/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
