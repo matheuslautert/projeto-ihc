@@ -13,6 +13,7 @@ import { OrientadorDetail } from './pages/OrientadorDetail'
 import { EmpresaDetail } from './pages/EmpresaDetail'
 import { AlunoDetail } from './pages/AlunoDetail'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AuthProvider } from './hooks/useAuth'
 
 // Configuração do React Query
 const queryClient = new QueryClient({
@@ -29,37 +30,38 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className="min-h-screen bg-background-primary">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <div className="flex">
-                  <Sidebar />
-                  <div className="flex-1 flex flex-col">
-                    <Header />
-                    <main className="flex-1 p-6">
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/vagas" element={<Vagas />} />
-                        <Route path="/alunos" element={<Alunos />} />
-                        <Route path="/orientadores" element={<Orientadores />} />
-                        <Route path="/documentos" element={<Documentos />} />
-                        
-                        {/* Rotas dinâmicas */}
-                        <Route path="/orientador/:orientadorId" element={<OrientadorDetail />} />
-                        <Route path="/empresa/:empresaId" element={<EmpresaDetail />} />
-                        <Route path="/aluno/:alunoId" element={<AlunoDetail />} />
-                      </Routes>
-                    </main>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-background-primary">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/*" element={
+                <ProtectedRoute>
+                  <div className="flex">
+                    <Sidebar />
+                    <div className="flex-1 flex flex-col">
+                      <Header />
+                      <main className="flex-1 p-6">
+                        <Routes>
+                          <Route path="/" element={<Dashboard />} />
+                          <Route path="/vagas" element={<Vagas />} />
+                          <Route path="/alunos" element={<Alunos />} />
+                          <Route path="/orientadores" element={<Orientadores />} />
+                          <Route path="/documentos" element={<Documentos />} />
+                          {/* Rotas dinâmicas */}
+                          <Route path="/orientador/:orientadorId" element={<OrientadorDetail />} />
+                          <Route path="/empresa/:empresaId" element={<EmpresaDetail />} />
+                          <Route path="/aluno/:alunoId" element={<AlunoDetail />} />
+                        </Routes>
+                      </main>
+                    </div>
                   </div>
-                </div>
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </div>
-      </Router>
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )

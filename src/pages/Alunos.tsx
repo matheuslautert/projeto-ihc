@@ -8,6 +8,7 @@ import { generateRouteId } from '../lib/utils'
 import { Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useAuth } from '../hooks/useAuth'
 
 // Function to format date
 const formatDate = (dateStr: string | undefined): string => {
@@ -48,7 +49,7 @@ export function Alunos() {
   const [obrigatorioFilter, setObrigatorioFilter] = useState<string>('all')
 
   // Load data
-  const { isLoading: isLoadingInterns } = useInterns()
+  const { data: interns, isLoading: isLoadingInterns, isError: isErrorInterns, error: errorInterns } = useInterns()
 
   // Create filters
   const filters: InternshipFilters = React.useMemo(() => {
@@ -70,7 +71,7 @@ export function Alunos() {
   }, [searchTerm, statusFilter, obrigatorioFilter])
 
   // Get filtered data
-  const { data: filteredInternships } = useFilteredInternships(filters)
+  const { data: filteredInternships, isLoading: isLoadingFiltered, isError: isErrorFiltered, error: errorFiltered } = useFilteredInternships(filters)
 
   // Transform internships to intern format for display
   const displayData = React.useMemo(() => {
@@ -79,8 +80,50 @@ export function Alunos() {
     return filteredInternships
   }, [filteredInternships])
 
+  const { user } = useAuth()
+
+  // Filtragem por papel
+  const filteredByRole = React.useMemo(() => {
+    if (!filteredInternships) return []
+    if (!user) return []
+    if (user.tipo === 'articulador') return filteredInternships
+    if (user.tipo === 'aluno') {
+      return filteredInternships.filter(i => i.nome && i.nome.trim().toLowerCase() === user.nome.trim().toLowerCase())
+    }
+    if (user.tipo === 'orientador') {
+      return filteredInternships.filter(i => {
+        const orientadores = [i.orientadorAtual, i.orientadorAnterior].map(o => o && o.trim().toLowerCase())
+        return orientadores.includes(user.nome.trim().toLowerCase())
+      })
+    }
+    return []
+  }, [filteredInternships, user])
+
+  // Exemplo de login para testes
+  const exemplosLogin = [
+    { papel: 'Aluno', login: 'fflamengo', senha: 'engo', nome: 'Franciele Flamengo' },
+    { papel: 'Orientador', login: 'pprofessor', senha: 'sor', nome: 'Professor 1' },
+    { papel: 'Articulador', login: 'articulador', senha: 'ador', nome: 'Articulador' },
+  ]
+
+  if (isLoadingInterns || isLoadingFiltered) {
+    return <div className="text-center text-text-primary mt-10">Carregando estagiários...</div>
+  }
+  if (isErrorInterns || isErrorFiltered) {
+    return <div className="text-center text-red-500 mt-10">Erro ao carregar estagiários: {(errorInterns?.message || errorFiltered?.message || 'Erro desconhecido')}</div>
+  }
+
   return (
     <div className="space-y-6">
+      {/* Exemplos de login */}
+      <div className="card bg-blue-900/30 border-l-4 border-blue-400 mb-6">
+        <h3 className="text-lg font-semibold text-blue-300 mb-2">Exemplos de Login para Teste</h3>
+        <ul className="list-disc pl-6 text-blue-200">
+          {exemplosLogin.map((ex, idx) => (
+            <li key={idx}><b>{ex.papel}:</b> login <span className="font-mono">{ex.login}</span> | senha <span className="font-mono">{ex.senha}</span> | nome <span className="font-mono">{ex.nome}</span></li>
+          ))}
+        </ul>
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -96,7 +139,7 @@ export function Alunos() {
       </div>
 
       {/* Statistics */}
-      {filteredInternships && (
+      {filteredByRole && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="card">
             <div className="flex items-center">
@@ -105,7 +148,7 @@ export function Alunos() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Total de Estagiários</p>
-                <p className="text-2xl font-bold text-text-primary">{filteredInternships.length}</p>
+                <p className="text-2xl font-bold text-text-primary">{filteredByRole.length}</p>
               </div>
             </div>
           </div>
@@ -118,7 +161,7 @@ export function Alunos() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Estágios Ativos</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {filteredInternships.filter(intern => getInternshipStatus(intern) === 'ATIVO').length}
+                  {filteredByRole.filter(intern => getInternshipStatus(intern) === 'ATIVO').length}
                 </p>
               </div>
             </div>
@@ -132,7 +175,7 @@ export function Alunos() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-text-muted">Empresas Diferentes</p>
                 <p className="text-2xl font-bold text-text-primary">
-                  {new Set(filteredInternships.map(intern => intern.empresa).filter(Boolean)).size}
+                  {new Set(filteredByRole.map(intern => intern.empresa).filter(Boolean)).size}
                 </p>
               </div>
             </div>
@@ -201,7 +244,7 @@ export function Alunos() {
 
       {/* Data Table */}
       <DataTable 
-        data={displayData} 
+        data={filteredByRole} 
         columns={[
           { 
             key: 'nome', 

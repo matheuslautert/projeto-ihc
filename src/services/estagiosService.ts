@@ -169,7 +169,7 @@ export const loadEstagiosData = async (): Promise<{
   estagiarios: Estagiario[]
 }> => {
   try {
-    const response = await fetch('/docs/database.csv')
+    const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vR1_Jjwof_6KC9NJcYyh1svu26TdWjuosE91LQVIx1gdXRhAEVSQSa0g0CQiV697A/pub?output=csv')
     const csvText = await response.text()
     
     const { data } = Papa.parse(csvText, {

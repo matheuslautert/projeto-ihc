@@ -18,7 +18,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { useAuth } from '../hooks/useAuth'
 import { DashboardCharts } from '../components/charts/DashboardCharts'
-
+import { useMemo } from 'react'
 
 
 // Function to format date
@@ -62,6 +62,49 @@ export function Dashboard() {
   // Detectar se é orientador
   const isAdvisor = user?.tipo === 'orientador'
   const advisorName = isAdvisor ? user?.nome : undefined
+
+  // Análise inteligente dos dados
+  const smartAnalysis = useMemo(() => {
+    if (!internshipData) return null
+    const { internships } = internshipData
+    const inconsistencies: string[] = []
+
+    // Empresas com nomes parecidos (case-insensitive)
+    const companyNames = internships.map(i => i.empresa?.trim()).filter(Boolean) as string[]
+    const companyNameMap: Record<string, string[]> = {}
+    companyNames.forEach(name => {
+      const key = name.toLowerCase()
+      if (!companyNameMap[key]) companyNameMap[key] = []
+      companyNameMap[key].push(name)
+    })
+    Object.values(companyNameMap).forEach(variations => {
+      const unique = Array.from(new Set(variations))
+      if (unique.length > 1) {
+        inconsistencies.push(`Empresa com nomes parecidos: ${unique.join(', ')}`)
+      }
+    })
+
+    // Estágios sem empresa
+    const noCompany = internships.filter(i => !i.empresa || i.empresa.trim() === '')
+    if (noCompany.length > 0) {
+      inconsistencies.push(`${noCompany.length} estágio(s) sem empresa informada.`)
+    }
+
+    // Estágios sem orientador
+    const noAdvisor = internships.filter(i => (!i.orientadorAtual && !i.orientadorAnterior))
+    if (noAdvisor.length > 0) {
+      inconsistencies.push(`${noAdvisor.length} estágio(s) sem orientador informado.`)
+    }
+
+    // Status inválidos
+    const validStatus = ['ATIVO', 'CONCLUÍDO', 'INTERROMPIDO', 'CANCELADO']
+    const invalidStatus = internships.filter(i => !validStatus.includes(i.status || ''))
+    if (invalidStatus.length > 0) {
+      inconsistencies.push(`${invalidStatus.length} estágio(s) com status inválido.`)
+    }
+
+    return inconsistencies
+  }, [internshipData])
 
   if (isLoading) {
     return (
@@ -187,6 +230,18 @@ export function Dashboard() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Análise inteligente dos dados */}
+      {smartAnalysis && smartAnalysis.length > 0 && (
+        <div className="card bg-yellow-900/30 border-l-4 border-yellow-400 mb-6">
+          <h3 className="text-lg font-semibold text-yellow-300 mb-2">Análise Inteligente dos Dados</h3>
+          <ul className="list-disc pl-6 text-yellow-200">
+            {smartAnalysis.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
         </div>
       )}
 

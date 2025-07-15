@@ -254,7 +254,7 @@ export async function loadInternshipData(): Promise<{
   if (cachedData) return cachedData
 
   try {
-    const response = await fetch('/docs/database.csv')
+    const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vR1_Jjwof_6KC9NJcYyh1svu26TdWjuosE91LQVIx1gdXRhAEVSQSa0g0CQiV697A/pub?output=csv')
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
     const csvText = await response.text()
 

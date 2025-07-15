@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Eye, EyeOff, GraduationCap, Mail, Lock } from 'lucide-react'
 import { useAdvisors, useInterns } from '../hooks/useInternships'
 import { generateLoginFromName, generatePasswordFromUser } from '../lib/utils'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export function Login() {
@@ -17,8 +17,7 @@ export function Login() {
 
   // Se já estiver logado, redireciona para dashboard
   if (user) {
-    navigate('/')
-    return null
+    return <Navigate to="/" replace />
   }
 
   // Função para autenticar
