@@ -250,40 +250,40 @@ export function Alunos() {
             key: 'nome', 
             header: 'Estagiário', 
             sortable: true,
-            render: (value: any) => (
+            render: (value: any) => value ? (
               <Link 
                 to={`/aluno/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
               >
                 {value}
               </Link>
-            )
+            ) : <span className="text-text-muted">-</span>
           },
           { 
             key: 'empresa', 
             header: 'Empresa', 
             sortable: true,
-            render: (value: any) => (
+            render: (value: any) => value ? (
               <Link 
                 to={`/empresa/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
               >
                 {value}
               </Link>
-            )
+            ) : <span className="text-text-muted">-</span>
           },
           { 
             key: 'orientadorAtual', 
             header: 'Orientador', 
             sortable: true,
-            render: (value: any) => (
+            render: (value: any) => value ? (
               <Link 
                 to={`/orientador/${generateRouteId(value)}`}
                 className="text-spotify-green hover:text-spotify-green-dark font-medium transition-colors duration-200"
               >
                 {value}
               </Link>
-            )
+            ) : <span className="text-text-muted">-</span>
           },
           { 
             key: 'status', 

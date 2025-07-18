@@ -4,6 +4,7 @@ import { useAdvisors, useInterns } from '../hooks/useInternships'
 import { generateLoginFromName, generatePasswordFromUser } from '../lib/utils'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { fetchLogins } from '../services/loginService'
 
 export function Login() {
   const [showPassword, setShowPassword] = useState(false)
@@ -21,40 +22,21 @@ export function Login() {
   }
 
   // Função para autenticar
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!advisors || !interns) {
-      setError('Dados ainda não carregados. Tente novamente em instantes.')
-      return
-    }
-    // Busca em orientadores
-    const advisor = advisors.find(a => generateLoginFromName(a.nome) === login.toLowerCase())
-    if (advisor) {
-      const expectedPassword = generatePasswordFromUser(advisor)
-      if (password === expectedPassword) {
-        authLogin({ tipo: 'orientador', nome: advisor.nome })
+    try {
+      const logins = await fetchLogins()
+      const found = logins.find(l => l.usuario === login && l.senha === password)
+      if (found) {
+        authLogin({ tipo: found.tipo || 'custom', nome: found.usuario })
         navigate('/')
         return
-      } else {
-        setError('Senha incorreta para orientador.')
-        return
       }
+      setError('Usuário ou senha inválidos.')
+    } catch (err) {
+      setError('Erro ao validar login. Tente novamente.')
     }
-    // Busca em alunos
-    const intern = interns.find(i => generateLoginFromName(i.nome) === login.toLowerCase())
-    if (intern) {
-      const expectedPassword = generatePasswordFromUser(intern)
-      if (password === expectedPassword) {
-        authLogin({ tipo: 'aluno', nome: intern.nome })
-        navigate('/')
-        return
-      } else {
-        setError('Senha incorreta para aluno.')
-        return
-      }
-    }
-    setError('Usuário não encontrado. Verifique o login.')
   }
 
   return (
