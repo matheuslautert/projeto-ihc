@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Search, User, Building2 } from 'lucide-react'
+import { Search, User, Building2 } from 'lucide-react'
 import { useInterns, useFilteredInternships } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { StatusBadge } from '../components/ui/StatusBadge'
@@ -28,8 +28,7 @@ const formatDate = (dateStr: string | undefined): string => {
   return dateStr
 }
 
-// Function to determine internship status
-const getInternshipStatus = (internship: any): InternshipStatus => {
+export const getInternshipStatus = (internship: any): InternshipStatus => {
   if (internship.conclusaoEstagio && internship.conclusaoEstagio.trim()) {
     const motivo = internship.motivoConclusao?.toLowerCase() || ''
     if (motivo.includes('contratação')) return 'CONCLUÍDO'
@@ -49,7 +48,7 @@ export function Alunos() {
   const [obrigatorioFilter, setObrigatorioFilter] = useState<string>('all')
 
   // Load data
-  const { data: interns, isLoading: isLoadingInterns, isError: isErrorInterns, error: errorInterns } = useInterns()
+  const { isLoading: isLoadingInterns, isError: isErrorInterns, error: errorInterns } = useInterns()
 
   // Create filters
   const filters: InternshipFilters = React.useMemo(() => {
@@ -73,13 +72,6 @@ export function Alunos() {
   // Get filtered data
   const { data: filteredInternships, isLoading: isLoadingFiltered, isError: isErrorFiltered, error: errorFiltered } = useFilteredInternships(filters)
 
-  // Transform internships to intern format for display
-  const displayData = React.useMemo(() => {
-    if (!filteredInternships) return []
-    
-    return filteredInternships
-  }, [filteredInternships])
-
   const { user } = useAuth()
 
   // Filtragem por papel
@@ -101,9 +93,10 @@ export function Alunos() {
 
   // Exemplo de login para testes
   const exemplosLogin = [
-    { papel: 'Aluno', login: 'fflamengo', senha: 'engo', nome: 'Franciele Flamengo' },
-    { papel: 'Orientador', login: 'pprofessor', senha: 'sor', nome: 'Professor 1' },
-    { papel: 'Articulador', login: 'articulador', senha: 'ador', nome: 'Articulador' },
+    { papel: 'Articulador', login: 'jcasagrande', senha: 'casagrande', nome: 'jcasagrande' },
+    { papel: 'Aluno', login: 'fflamengo', senha: 'engo', nome: 'fflamengo' },
+    { papel: 'Orientador', login: 'pprofessor', senha: 'sor', nome: 'pprofessor' },
+    { papel: 'Articulador', login: 'articulador', senha: 'ador', nome: 'articulador' },
   ]
 
   if (isLoadingInterns || isLoadingFiltered) {
@@ -132,10 +125,7 @@ export function Alunos() {
             Lista completa de estagiários e seus estágios
           </p>
         </div>
-        <button className="btn-primary flex items-center">
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Estagiário
-        </button>
+        {/* Botão de novo estagiário removido */}
       </div>
 
       {/* Statistics */}

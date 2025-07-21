@@ -4,6 +4,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/projeto-ihc/',
   plugins: [react()],
   resolve: {
     alias: {

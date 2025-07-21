@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { Eye, EyeOff, GraduationCap, Mail, Lock } from 'lucide-react'
-import { useAdvisors, useInterns } from '../hooks/useInternships'
-import { generateLoginFromName, generatePasswordFromUser } from '../lib/utils'
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { fetchLogins } from '../services/loginService'
@@ -11,8 +9,6 @@ export function Login() {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { data: advisors } = useAdvisors()
-  const { data: interns } = useInterns()
   const navigate = useNavigate()
   const { user, login: authLogin } = useAuth()
 

@@ -15,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null | undefined>(undefined)
+  const [user, setUser] = useState<User | null>(null)
 
   const updateUser = useCallback(() => {
     const stored = localStorage.getItem('user')
@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     localStorage.removeItem('user')
     setUser(null)
-    window.location.href = '/login'
+    window.location.href = '/projeto-ihc/login'
   }
 
   function login(userData: User) {

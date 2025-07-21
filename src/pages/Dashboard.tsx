@@ -19,6 +19,7 @@ import { ptBR } from 'date-fns/locale'
 import { useAuth } from '../hooks/useAuth'
 import { DashboardCharts } from '../components/charts/DashboardCharts'
 import { useMemo } from 'react'
+import { getInternshipStatus } from './Alunos'
 
 
 // Function to format date
@@ -98,7 +99,7 @@ export function Dashboard() {
 
     // Status inválidos
     const validStatus = ['ATIVO', 'CONCLUÍDO', 'INTERROMPIDO', 'CANCELADO']
-    const invalidStatus = internships.filter(i => !validStatus.includes(i.status || ''))
+    const invalidStatus = internships.filter(i => !validStatus.includes(getInternshipStatus(i)))
     if (invalidStatus.length > 0) {
       inconsistencies.push(`${invalidStatus.length} estágio(s) com status inválido.`)
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Search, Users, BookOpen, CheckCircle } from 'lucide-react'
+import { Search, Users, BookOpen, CheckCircle } from 'lucide-react'
 import { useAdvisors } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { generateRouteId } from '../lib/utils'
@@ -53,10 +53,7 @@ export function Orientadores() {
             Lista de orientadores e seus estágios supervisionados
           </p>
         </div>
-        <button className="btn-primary flex items-center">
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Orientador
-        </button>
+        {/* Botão de novo orientador removido */}
       </div>
 
       {/* Statistics */}

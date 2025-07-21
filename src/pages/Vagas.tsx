@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Search, Building2, Users } from 'lucide-react'
+import { Search, Building2, Users } from 'lucide-react'
 import { useCompanies } from '../hooks/useInternships'
 import { DataTable } from '../components/ui/DataTable'
 import { generateRouteId } from '../lib/utils'
@@ -53,10 +53,7 @@ export function Vagas() {
             Lista de empresas parceiras e suas vagas de estágio
           </p>
         </div>
-        <button className="btn-primary flex items-center">
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Empresa
-        </button>
+        {/* Botão de nova empresa removido */}
       </div>
 
       {/* Statistics */}
