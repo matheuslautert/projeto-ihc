@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     localStorage.removeItem('user')
     setUser(null)
-    window.location.href = '/projeto-ihc/login'
+    window.location.href = '/login'
   }
 
   function login(userData: User) {

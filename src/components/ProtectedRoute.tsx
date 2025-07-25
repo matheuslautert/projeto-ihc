@@ -8,7 +8,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     return <div style={{color: 'white', textAlign: 'center', marginTop: '2rem'}}>Carregando autenticação...</div>
   }
   if (!user) {
-    return <Navigate to="/projeto-ihc/login" replace />
+    return <Navigate to="/login" replace />
   }
   return <>{children}</>
 } 
